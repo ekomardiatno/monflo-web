@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
-import { resetActivities } from '@/store/slices/activitySlice';
+import { restoreActivitiesThunk } from '@/store/slices/activitySlice';
 import { importBackup } from '@/utils/backup';
+import { useToast } from '@/components/shared/Toast';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import type { ActivityType } from '@/types';
 
@@ -12,15 +13,21 @@ export default function RestoreMenu({ onRender }: { onRender: (props: {
   onPress: () => void;
 }) => React.ReactNode }) {
   const dispatch = useAppDispatch();
+  const showToast = useToast();
   const [isAlertShown, setIsAlertShown] = useState(false);
   const [fileContent, setFileContent] = useState<ActivityType[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleRestore = () => {
+  const handleRestore = async () => {
     setIsAlertShown(false);
     if (fileContent) {
-      dispatch(resetActivities(fileContent));
-      alert('Restore completed');
+      try {
+        const stripped = fileContent.map(({ id: _, ...rest }) => rest);
+        await dispatch(restoreActivitiesThunk(stripped)).unwrap();
+        showToast('Restore completed', 'success');
+      } catch {
+        showToast('Restore failed', 'error');
+      }
     }
   };
 
@@ -36,7 +43,7 @@ export default function RestoreMenu({ onRender }: { onRender: (props: {
       setFileContent(data);
       setIsAlertShown(true);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Restore failed');
+      showToast(err instanceof Error ? err.message : 'Restore failed', 'error');
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

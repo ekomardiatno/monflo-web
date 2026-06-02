@@ -1,10 +1,12 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { ActivityType } from '@/types';
 import {
   fetchActivitiesApi,
   createActivityApi,
   updateActivityApi,
   deleteActivityApi,
+  restoreActivitiesApi,
+  resetActivitiesApi,
 } from '@/services/activity.service';
 
 interface ActivityState {
@@ -43,12 +45,24 @@ export const deleteActivityThunk = createAsyncThunk(
   },
 );
 
+export const restoreActivitiesThunk = createAsyncThunk(
+  'activity/restore',
+  async (activities: Omit<ActivityType, 'id'>[]) => restoreActivitiesApi(activities),
+);
+
+export const resetActivitiesThunk = createAsyncThunk(
+  'activity/reset',
+  async () => {
+    await resetActivitiesApi();
+  },
+);
+
 const activitySlice = createSlice({
   name: 'activity',
   initialState,
   reducers: {
-    resetActivities: (state, action: PayloadAction<ActivityType[] | undefined>) => {
-      state.activities = action.payload ?? [];
+    clearActivities: (state) => {
+      state.activities = [];
     },
   },
   extraReducers: (builder) => {
@@ -82,8 +96,18 @@ const activitySlice = createSlice({
     builder.addCase(deleteActivityThunk.fulfilled, (state, action) => {
       state.activities = state.activities.filter((a) => a.id !== action.payload);
     });
+
+    // Restore
+    builder.addCase(restoreActivitiesThunk.fulfilled, (state, action) => {
+      state.activities = action.payload;
+    });
+
+    // Reset
+    builder.addCase(resetActivitiesThunk.fulfilled, (state) => {
+      state.activities = [];
+    });
   },
 });
 
-export const { resetActivities } = activitySlice.actions;
+export const { clearActivities } = activitySlice.actions;
 export default activitySlice.reducer;

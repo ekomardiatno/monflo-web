@@ -15,7 +15,7 @@ import {
   updateSettingsThunk,
 } from '@/store/slices/appSlice';
 import { logoutThunk, changeNameThunk } from '@/store/slices/authSlice';
-import { resetActivities } from '@/store/slices/activitySlice';
+import { clearActivities } from '@/store/slices/activitySlice';
 import { changePasswordApi } from '@/services/auth.service';
 import { COLORS } from '@/constants';
 import { exportBackup } from '@/utils/backup';
@@ -189,7 +189,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     setLoggingOut(true);
     await dispatch(logoutThunk()).unwrap().catch(() => {});
-    dispatch(resetActivities([]));
+    dispatch(clearActivities());
     navigate('/login', { replace: true });
   };
 

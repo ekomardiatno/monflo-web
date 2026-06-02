@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { store, persistor } from './store'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+import { ToastProvider } from './components/shared/Toast'
 import App from './App'
 import './index.css'
 
@@ -36,7 +37,9 @@ createRoot(document.getElementById('root')!).render(
         <Provider store={store}>
           <PersistGate loading={<div style={{ padding: 20 }}>Loading...</div>} persistor={persistor}>
             <BrowserRouter basename={import.meta.env.BASE_URL}>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </BrowserRouter>
           </PersistGate>
         </Provider>

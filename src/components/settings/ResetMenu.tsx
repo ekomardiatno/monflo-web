@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { MdWarning } from 'react-icons/md';
 import { useTheme } from '@/hooks/useTheme';
 import { useAppDispatch } from '@/store/hooks';
-import { resetActivities } from '@/store/slices/activitySlice';
+import { resetActivitiesThunk } from '@/store/slices/activitySlice';
+import { useToast } from '@/components/shared/Toast';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
 export default function ResetMenu({ onRender }: { onRender: (props: {
@@ -13,13 +14,18 @@ export default function ResetMenu({ onRender }: { onRender: (props: {
   onPress: () => void;
 }) => React.ReactNode }) {
   const dispatch = useAppDispatch();
+  const showToast = useToast();
   const [isAlertShown, setIsAlertShown] = useState(false);
   const theme = useTheme();
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setIsAlertShown(false);
-    dispatch(resetActivities());
-    alert('Activity history erased');
+    try {
+      await dispatch(resetActivitiesThunk()).unwrap();
+      showToast('Activity history erased', 'success');
+    } catch {
+      showToast('Failed to erase activities', 'error');
+    }
   };
 
   return (

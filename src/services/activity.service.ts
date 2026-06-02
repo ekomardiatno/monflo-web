@@ -24,3 +24,16 @@ export function deleteActivityApi(id: number) {
     method: 'DELETE',
   });
 }
+
+export function restoreActivitiesApi(activities: Omit<ActivityType, 'id'>[]) {
+  return apiFetch<ActivityType[]>('/activities/restore', {
+    method: 'POST',
+    body: JSON.stringify({ activities }),
+  });
+}
+
+export function resetActivitiesApi() {
+  return apiFetch<{ message: string }>('/activities/reset', {
+    method: 'DELETE',
+  });
+}
