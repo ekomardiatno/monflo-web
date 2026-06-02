@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /var/www/html/monflo"
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo mkdir -p /var/www/html/monflo && sudo chown ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/html/monflo"
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key" \
             dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/html/monflo/
