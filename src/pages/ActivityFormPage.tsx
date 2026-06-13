@@ -305,7 +305,7 @@ export default function ActivityFormPage() {
     try {
       const actData = {
         expense: isExpense,
-        date: dayjs(`${data.date} ${data.time}`).format('YYYY-MM-DD HH:mm:ss'),
+        date: dayjs(`${data.date} ${data.time}`).toISOString(),
         description: data.description || '',
         amount: Number(String(data.amount).replace(/\D/g, '')),
         category: data.category,
