@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdReceiptLong, MdArrowForward } from 'react-icons/md';
 import dayjs from 'dayjs';
@@ -8,18 +7,8 @@ import Activity from '@/components/activity/Activity';
 
 export default function ThisMonthActivities() {
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
+  const recentActivities = useAppSelector(state => state.activity.summary?.recentActivities ?? []);
   const navigate = useNavigate();
-  const currentDate = new Date();
-
-  const thisMonthActivities = useMemo(() => {
-    return activities
-      .filter(activity => {
-        const d = new Date(activity.date);
-        return d.getFullYear() === currentDate.getFullYear() && d.getMonth() === currentDate.getMonth();
-      })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [activities]);
 
   const cardShadow = theme.schema === 'DARK'
     ? '0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04)'
@@ -53,7 +42,7 @@ export default function ThisMonthActivities() {
             boxShadow: cardShadow,
           }}
         >
-          {thisMonthActivities.length < 1 ? (
+          {recentActivities.length < 1 ? (
             <div className="flex flex-col items-center justify-center py-14 px-6">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
@@ -69,7 +58,7 @@ export default function ThisMonthActivities() {
               </p>
             </div>
           ) : (
-            thisMonthActivities.slice(0, 5).map((activity, i, arr) => (
+            recentActivities.slice(0, 5).map((activity, i, arr) => (
               <Activity
                 key={activity.id}
                 id={activity.id}

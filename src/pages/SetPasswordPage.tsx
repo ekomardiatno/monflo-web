@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import { useTheme } from '@/hooks/useTheme';
 import { useAppDispatch } from '@/store/hooks';
 import { setPasswordThunk } from '@/store/slices/authSlice';
-import { fetchActivitiesThunk } from '@/store/slices/activitySlice';
+import { fetchSummaryThunk } from '@/store/slices/activitySlice';
 import { fetchSettingsThunk } from '@/store/slices/appSlice';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { COLORS } from '@/constants';
@@ -48,7 +48,7 @@ export default function SetPasswordPage() {
     setError(null);
     try {
       await dispatch(setPasswordThunk(data.password)).unwrap();
-      dispatch(fetchActivitiesThunk());
+      dispatch(fetchSummaryThunk());
       dispatch(fetchSettingsThunk());
       navigate('/', { replace: true });
     } catch (err: any) {

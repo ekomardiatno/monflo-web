@@ -12,23 +12,26 @@ export default function Balance({
   dateView: Date;
 }) {
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthly = useAppSelector(state => state.activity.summary?.monthly ?? {});
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
 
   const balanceData = useMemo(() => {
-    const current = new Date(dateView.getFullYear(), dateView.getMonth(), 1, 0, 0, 0, 0);
-    const next = new Date(dateView.getFullYear(), dateView.getMonth() + 1, 1, 0, 0, 0, 0);
-
-    const opening = activities
-      .filter(a => new Date(a.date).getTime() < current.getTime())
-      .reduce((total, a) => total + a.amount * (a.expense ? -1 : 1), 0);
-
-    const closing = activities
-      .filter(a => new Date(a.date).getTime() < next.getTime())
-      .reduce((total, a) => total + a.amount * (a.expense ? -1 : 1), 0);
-
+    const viewMonth = dateView.getMonth();
+    const viewYear = dateView.getFullYear();
+    let opening = 0;
+    let closing = 0;
+    for (const [key, m] of Object.entries(monthly)) {
+      const [y, mo] = key.split('-').map(Number);
+      const net = m.income - m.expense;
+      if (y < viewYear || (y === viewYear && mo <= viewMonth)) {
+        closing += net;
+      }
+      if (y < viewYear || (y === viewYear && mo - 1 < viewMonth)) {
+        opening += net;
+      }
+    }
     return { opening, closing };
-  }, [activities, dateView]);
+  }, [monthly, dateView]);
 
   const cardShadow = theme.schema === 'DARK'
     ? '0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04)'

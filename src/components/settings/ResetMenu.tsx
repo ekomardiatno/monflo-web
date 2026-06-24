@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MdWarning } from 'react-icons/md';
 import { useTheme } from '@/hooks/useTheme';
 import { useAppDispatch } from '@/store/hooks';
-import { resetActivitiesThunk } from '@/store/slices/activitySlice';
+import { resetActivitiesThunk, fetchSummaryThunk } from '@/store/slices/activitySlice';
 import { useToast } from '@/components/shared/Toast';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
@@ -22,6 +22,7 @@ export default function ResetMenu({ onRender }: { onRender: (props: {
     setIsAlertShown(false);
     try {
       await dispatch(resetActivitiesThunk()).unwrap();
+      dispatch(fetchSummaryThunk());
       showToast('Activity history erased', 'success');
     } catch {
       showToast('Failed to erase activities', 'error');

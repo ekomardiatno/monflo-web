@@ -51,6 +51,21 @@ export type SettingsType = {
   autoSelectAppearance: boolean;
 };
 
+export type MonthlySummary = {
+  income: number;
+  expense: number;
+  expenseCategories: Record<string, number>;
+  incomeCategories: Record<string, number>;
+};
+
+export type SummaryType = {
+  balance: number;
+  totalIncome: number;
+  totalExpense: number;
+  monthly: Record<string, MonthlySummary>;
+  recentActivities: ActivityType[];
+};
+
 export type ThemeSchema = 'LIGHT' | 'DARK';
 
 export interface ThemeColors {

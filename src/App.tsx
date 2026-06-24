@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useAppDispatch } from '@/store/hooks'
 import { loadUserThunk } from '@/store/slices/authSlice'
-import { fetchActivitiesThunk } from '@/store/slices/activitySlice'
+import { fetchSummaryThunk } from '@/store/slices/activitySlice'
 import { fetchSettingsThunk } from '@/store/slices/appSlice'
 import AppShell from './components/layout/AppShell'
 import ProtectedRoute from './components/auth/ProtectedRoute'
@@ -29,7 +29,7 @@ function App() {
       dispatch(loadUserThunk())
         .unwrap()
         .then(() => {
-          dispatch(fetchActivitiesThunk())
+          dispatch(fetchSummaryThunk())
           dispatch(fetchSettingsThunk())
         })
         .catch(() => {})

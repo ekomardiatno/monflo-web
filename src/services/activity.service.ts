@@ -1,8 +1,13 @@
 import { apiFetch } from './api';
-import type { ActivityType } from '@/types';
+import type { ActivityType, SummaryType } from '@/types';
 
-export function fetchActivitiesApi() {
-  return apiFetch<ActivityType[]>('/activities');
+export function fetchActivitiesApi(month?: number, year?: number) {
+  const params = month && year ? `?month=${month}&year=${year}` : '';
+  return apiFetch<ActivityType[]>(`/activities${params}`);
+}
+
+export function fetchSummaryApi() {
+  return apiFetch<SummaryType>('/activities/summary');
 }
 
 export function createActivityApi(data: Omit<ActivityType, 'id'>) {

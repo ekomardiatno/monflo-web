@@ -7,7 +7,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useGoogleLogin } from '@react-oauth/google';
 import { loginThunk, googleAuthThunk, clearAuthError } from '@/store/slices/authSlice';
-import { fetchActivitiesThunk } from '@/store/slices/activitySlice';
+import { fetchSummaryThunk } from '@/store/slices/activitySlice';
 import { fetchSettingsThunk } from '@/store/slices/appSlice';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { COLORS } from '@/constants';
@@ -34,7 +34,7 @@ export default function LoginPage() {
       dispatch(googleAuthThunk(response.access_token))
         .unwrap()
         .then(() => {
-          dispatch(fetchActivitiesThunk());
+          dispatch(fetchSummaryThunk());
           dispatch(fetchSettingsThunk());
           navigate('/', { replace: true });
         })
@@ -62,7 +62,7 @@ export default function LoginPage() {
     dispatch(clearAuthError());
     try {
       await dispatch(loginThunk(data)).unwrap();
-      dispatch(fetchActivitiesThunk());
+      dispatch(fetchSummaryThunk());
       dispatch(fetchSettingsThunk());
       navigate('/', { replace: true });
     } catch {

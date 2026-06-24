@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
-import { restoreActivitiesThunk } from '@/store/slices/activitySlice';
+import { restoreActivitiesThunk, fetchSummaryThunk } from '@/store/slices/activitySlice';
 import { importBackup } from '@/utils/backup';
 import { useToast } from '@/components/shared/Toast';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
@@ -24,6 +24,7 @@ export default function RestoreMenu({ onRender }: { onRender: (props: {
       try {
         const stripped = fileContent.map(({ id: _, ...rest }) => rest);
         await dispatch(restoreActivitiesThunk(stripped)).unwrap();
+        dispatch(fetchSummaryThunk());
         showToast('Restore completed', 'success');
       } catch {
         showToast('Restore failed', 'error');

@@ -11,7 +11,7 @@ import {
 } from 'react-icons/md';
 import { useTheme } from '@/hooks/useTheme';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { createActivityThunk, updateActivityThunk, deleteActivityThunk } from '@/store/slices/activitySlice';
+import { createActivityThunk, updateActivityThunk, deleteActivityThunk, fetchSummaryThunk } from '@/store/slices/activitySlice';
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, COLORS } from '@/constants';
 import { iconInfo } from '@/constants/categories';
 import capitalizeFirstText from '@/utils/capitalize';
@@ -245,7 +245,7 @@ export default function ActivityFormPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthlyActivities = useAppSelector(state => state.activity.monthlyActivities);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<string>(MODAL_TYPE.INSERT);
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -254,8 +254,12 @@ export default function ActivityFormPage() {
   const isEdit = !!id;
   const activity = useMemo(() => {
     if (!id) return undefined;
-    return activities.find(a => a.id === Number(id));
-  }, [id, activities]);
+    for (const acts of Object.values(monthlyActivities)) {
+      const found = acts.find(a => a.id === Number(id));
+      if (found) return found;
+    }
+    return undefined;
+  }, [id, monthlyActivities]);
 
   const activityType = useMemo(() => {
     if (activity) return activity.expense ? 'expense' : 'income';
@@ -315,6 +319,7 @@ export default function ActivityFormPage() {
       } else {
         await dispatch(createActivityThunk(actData)).unwrap();
       }
+      dispatch(fetchSummaryThunk());
       navigate(-1);
     } catch {
       // stay on page on error
@@ -328,6 +333,7 @@ export default function ActivityFormPage() {
       setSaving(true);
       try {
         await dispatch(deleteActivityThunk(activity.id)).unwrap();
+        dispatch(fetchSummaryThunk());
         navigate(-1);
       } catch {
         // stay on page on error

@@ -18,34 +18,16 @@ export default function ExpensesCard({ currentDate = new Date() }: { currentDate
   const navigate = useNavigate();
   const theme = useTheme();
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthly = useAppSelector(state => state.activity.summary?.monthly ?? {});
 
   const startDateCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 0, 0, 0, 0);
-  const endDateCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
-  const startDateLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1, 0, 0, 0, 0);
-  const endDateLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0, 23, 59, 59, 999);
 
-  const currentMonthActivities = useMemo(() => {
-    const filtered = activities.filter(activity => {
-      const d = new Date(activity.date);
-      return d.getTime() >= startDateCurrentMonth.getTime() && d.getTime() <= endDateCurrentMonth.getTime() && activity.expense;
-    });
-    return filtered.reduce((acc: Record<string, number>, item) => {
-      acc[item.category] = (acc[item.category] || 0) + item.amount;
-      return acc;
-    }, {});
-  }, [activities, startDateCurrentMonth.getTime(), endDateCurrentMonth.getTime()]);
+  const currentKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+  const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+  const lastKey = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`;
 
-  const lastMonthActivities = useMemo(() => {
-    const filtered = activities.filter(activity => {
-      const d = new Date(activity.date);
-      return d.getTime() >= startDateLastMonth.getTime() && d.getTime() <= endDateLastMonth.getTime() && activity.expense;
-    });
-    return filtered.reduce((acc: Record<string, number>, item) => {
-      acc[item.category] = (acc[item.category] || 0) + item.amount;
-      return acc;
-    }, {});
-  }, [activities, startDateLastMonth.getTime(), endDateLastMonth.getTime()]);
+  const currentMonthActivities = monthly[currentKey]?.expenseCategories ?? {};
+  const lastMonthActivities = monthly[lastKey]?.expenseCategories ?? {};
 
   const categoriesAmount = useMemo(() => {
     const listed = EXPENSE_CATEGORIES.map(item => ({

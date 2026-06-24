@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import numeral from 'numeral';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -7,29 +6,12 @@ import { COLORS, HIDDEN_AMOUNT_TEXT } from '@/constants';
 
 export default function BalanceCard({ stuck = false }: { stuck?: boolean }) {
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
-  const activities = useAppSelector(state => state.activity.activities);
+  const summary = useAppSelector(state => state.activity.summary);
   const dispatch = useAppDispatch();
 
-  const balance = useMemo(() => {
-    return activities.reduce(
-      (total, activity) => total + activity.amount * (activity.expense ? -1 : 1),
-      0,
-    );
-  }, [activities]);
-
-  const expense = useMemo(() => {
-    return activities.reduce(
-      (total, activity) => total + activity.amount * (activity.expense ? 1 : 0),
-      0,
-    );
-  }, [activities]);
-
-  const income = useMemo(() => {
-    return activities.reduce(
-      (total, activity) => total + activity.amount * (activity.expense ? 0 : 1),
-      0,
-    );
-  }, [activities]);
+  const balance = summary?.balance ?? 0;
+  const expense = summary?.totalExpense ?? 0;
+  const income = summary?.totalIncome ?? 0;
 
   return (
     <div

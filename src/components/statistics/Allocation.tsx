@@ -21,27 +21,21 @@ export default function Allocation({
   style?: React.CSSProperties;
 }) {
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthly = useAppSelector(state => state.activity.summary?.monthly ?? {});
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
   const navigate = useNavigate();
 
   const data = useMemo(() => {
-    const filtered = activities.filter(activity => {
-      const d = new Date(activity.date);
-      return (
-        d.getMonth() === new Date(dateView).getMonth() &&
-        d.getFullYear() === new Date(dateView).getFullYear() &&
-        activity.expense === expense
-      );
-    });
-    const allocation: Record<string, number> = {};
+    const key = `${dateView.getFullYear()}-${String(dateView.getMonth() + 1).padStart(2, '0')}`;
+    const categories = expense
+      ? (monthly[key]?.expenseCategories ?? {})
+      : (monthly[key]?.incomeCategories ?? {});
     let total = 0;
-    for (const a of filtered) {
-      allocation[a.category] = (allocation[a.category] || 0) + Number(a.amount);
-      total += Number(a.amount);
+    for (const amount of Object.values(categories)) {
+      total += amount;
     }
-    return { total, allocation };
-  }, [activities, dateView, expense]);
+    return { total, allocation: categories };
+  }, [monthly, dateView, expense]);
 
   return (
     <div style={style} className={customTitle ? '' : 'px-5'}>

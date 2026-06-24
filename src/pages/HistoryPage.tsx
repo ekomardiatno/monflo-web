@@ -4,7 +4,8 @@ import dayjs from 'dayjs';
 import numeral from 'numeral';
 import { MdReceiptLong } from 'react-icons/md';
 import { useTheme } from '@/hooks/useTheme';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { fetchMonthActivitiesThunk } from '@/store/slices/activitySlice';
 import { COLORS, HIDDEN_AMOUNT_TEXT } from '@/constants';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import Activity from '@/components/activity/Activity';
@@ -12,11 +13,17 @@ import Activity from '@/components/activity/Activity';
 export default function HistoryPage() {
   const { dateView: dateViewParam } = useParams<{ dateView?: string }>();
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
-  const amountVisibility = useAppSelector(state => state.app.amountVisibility);
+  const dispatch = useAppDispatch();
   const dateView = useMemo(() => dateViewParam ? new Date(dateViewParam) : new Date(), [dateViewParam]);
+  const monthKey = `${dateView.getFullYear()}-${String(dateView.getMonth() + 1).padStart(2, '0')}`;
+  const monthActivities = useAppSelector(state => state.activity.monthlyActivities[monthKey] ?? []);
+  const amountVisibility = useAppSelector(state => state.app.amountVisibility);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchMonthActivitiesThunk({ month: dateView.getMonth() + 1, year: dateView.getFullYear() }));
+  }, [monthKey]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -30,20 +37,14 @@ export default function HistoryPage() {
   }, []);
 
   const { grouped, totalIncome, totalExpense } = useMemo(() => {
-    const month = dateView.getMonth();
-    const year = dateView.getFullYear();
-    const filtered = activities
-      .filter(activity => {
-        const d = new Date(activity.date);
-        return d.getMonth() === month && d.getFullYear() === year;
-      })
+    const sorted = [...monthActivities]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     let totalIncome = 0;
     let totalExpense = 0;
-    const grouped: Record<string, typeof filtered> = {};
+    const grouped: Record<string, typeof sorted> = {};
 
-    for (const activity of filtered) {
+    for (const activity of sorted) {
       const key = dayjs(activity.date).format('ddd, DD MMM YYYY');
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(activity);
@@ -55,7 +56,7 @@ export default function HistoryPage() {
     }
 
     return { grouped, totalIncome, totalExpense };
-  }, [activities, dateView]);
+  }, [monthActivities]);
 
   const dateKeys = Object.keys(grouped);
 

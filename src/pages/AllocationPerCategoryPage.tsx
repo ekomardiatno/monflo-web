@@ -17,12 +17,13 @@ export default function AllocationPerCategoryPage() {
     category?: string;
   }>();
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
   const navigate = useNavigate();
 
   const expense = type === 'expense';
   const dateView = useMemo(() => new Date(dateViewParam || new Date().toISOString()), [dateViewParam]);
+  const monthKey = `${dateView.getFullYear()}-${String(dateView.getMonth() + 1).padStart(2, '0')}`;
+  const monthActivities = useAppSelector(state => state.activity.monthlyActivities[monthKey] ?? []);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
@@ -42,21 +43,13 @@ export default function AllocationPerCategoryPage() {
   }, [category, navigate]);
 
   const { data, total } = useMemo(() => {
-    const filtered = activities
-      .filter(activity => {
-        const d = new Date(activity.date);
-        return (
-          d.getMonth() === dateView.getMonth() &&
-          d.getFullYear() === dateView.getFullYear() &&
-          activity.expense === expense &&
-          activity.category === category
-        );
-      })
+    const filtered = monthActivities
+      .filter(activity => activity.expense === expense && activity.category === category)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     const total = filtered.reduce((sum, a) => sum + Number(a.amount), 0);
     return { data: filtered, total };
-  }, [activities, dateView, expense, category]);
+  }, [monthActivities, expense, category]);
 
   return (
     <ScreenLayout

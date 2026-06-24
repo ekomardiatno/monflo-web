@@ -15,19 +15,17 @@ export default function Overview({
   dateView: Date;
 }) {
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthly = useAppSelector(state => state.activity.summary?.monthly ?? {});
   const navigate = useNavigate();
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
 
   const overview = useMemo(() => {
-    const filtered = activities.filter(a => {
-      const d = new Date(a.date);
-      return d.getMonth() === dateView.getMonth() && d.getFullYear() === dateView.getFullYear();
-    });
-    const income = filtered.filter(a => !a.expense).reduce((t, a) => t + a.amount, 0);
-    const expense = filtered.filter(a => a.expense).reduce((t, a) => t + a.amount, 0);
+    const key = `${dateView.getFullYear()}-${String(dateView.getMonth() + 1).padStart(2, '0')}`;
+    const m = monthly[key];
+    const income = m?.income ?? 0;
+    const expense = m?.expense ?? 0;
     return { income, expense, total: income - expense };
-  }, [activities, dateView]);
+  }, [monthly, dateView]);
 
   const rows = [
     { label: 'Income', value: overview.income, color: COLORS.colorSuccess500, dot: 'rgba(16,185,129,.15)' },

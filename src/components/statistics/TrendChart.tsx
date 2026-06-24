@@ -21,7 +21,7 @@ export default function TrendChart({
 }) {
   const theme = useTheme();
   const [mtdYtd, setMtdYtd] = useState(MTD);
-  const activities = useAppSelector(state => state.activity.activities);
+  const monthly = useAppSelector(state => state.activity.summary?.monthly ?? {});
 
   let currentDate = dateView ?? new Date(new Date().setHours(0, 0, 0, 0));
   const today = new Date(new Date().setHours(0, 0, 0, 0));
@@ -29,53 +29,49 @@ export default function TrendChart({
     currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 0, 0, 0, 0);
   }
 
+  const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+  const monthActivities = useAppSelector(state => state.activity.monthlyActivities[monthKey] ?? []);
+
   const lineColor = expense ? COLORS.colorDanger500 : COLORS.colorSuccess500;
   const gradientId = expense ? 'gradExpense' : 'gradIncome';
 
   const data = useMemo(() => {
     const points = [];
-    const count = mtdYtd === MTD ? currentDate.getDate() : currentDate.getMonth() + 1;
 
-    for (let i = 0; i < count; i++) {
-      const label = dayjs(
-        new Date(
-          currentDate.getFullYear(),
-          mtdYtd === MTD ? currentDate.getMonth() : i,
-          mtdYtd === MTD ? i + 1 : 1,
-        ),
-      ).format(mtdYtd === MTD ? 'D' : 'MMM');
-
-      const fullLabel = dayjs(
-        new Date(
-          currentDate.getFullYear(),
-          mtdYtd === MTD ? currentDate.getMonth() : i,
-          mtdYtd === MTD ? i + 1 : 1,
-        ),
-      ).format(mtdYtd === MTD ? 'ddd, DD MMM YY' : 'MMM Y');
-
-      const value = activities
-        .filter(activity => {
-          const d = new Date(activity.date);
-          if (mtdYtd === MTD) {
-            return (
-              d.getDate() === i + 1 &&
-              d.getMonth() === currentDate.getMonth() &&
-              d.getFullYear() === currentDate.getFullYear() &&
-              activity.expense === expense
-            );
-          }
-          return (
-            d.getMonth() === i &&
-            d.getFullYear() === currentDate.getFullYear() &&
-            activity.expense === expense
-          );
-        })
-        .reduce((total, a) => total + Number(a.amount), 0);
-
-      points.push({ label, fullLabel, value });
+    if (mtdYtd === YTD) {
+      const count = currentDate.getMonth() + 1;
+      for (let i = 0; i < count; i++) {
+        const key = `${currentDate.getFullYear()}-${String(i + 1).padStart(2, '0')}`;
+        const m = monthly[key];
+        const value = expense ? (m?.expense ?? 0) : (m?.income ?? 0);
+        const d = new Date(currentDate.getFullYear(), i, 1);
+        points.push({
+          label: dayjs(d).format('MMM'),
+          fullLabel: dayjs(d).format('MMM Y'),
+          value,
+        });
+      }
+    } else {
+      // MTD: build day index from month activities in single pass
+      const dayIndex: Record<number, number> = {};
+      for (const a of monthActivities) {
+        if (a.expense !== expense) continue;
+        const day = new Date(a.date).getDate();
+        dayIndex[day] = (dayIndex[day] || 0) + Number(a.amount);
+      }
+      const count = currentDate.getDate();
+      for (let i = 0; i < count; i++) {
+        const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1);
+        points.push({
+          label: dayjs(d).format('D'),
+          fullLabel: dayjs(d).format('ddd, DD MMM YY'),
+          value: dayIndex[i + 1] || 0,
+        });
+      }
     }
+
     return points;
-  }, [mtdYtd, activities, expense, currentDate]);
+  }, [mtdYtd, monthly, monthActivities, expense, currentDate]);
 
   const isNoData = useMemo(() => data.every(p => p.value === 0), [data]);
 

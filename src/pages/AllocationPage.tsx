@@ -4,7 +4,8 @@ import numeral from 'numeral';
 import dayjs from 'dayjs';
 import { MdDonutSmall, MdChevronRight } from 'react-icons/md';
 import { useTheme } from '@/hooks/useTheme';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { fetchMonthActivitiesThunk } from '@/store/slices/activitySlice';
 import { COLORS, HIDDEN_AMOUNT_TEXT } from '@/constants';
 import { iconInfo } from '@/constants/categories';
 import ActivityIcon from '@/components/shared/ActivityIcon';
@@ -14,14 +15,20 @@ import type { Categories } from '@/types';
 export default function AllocationPage() {
   const { dateView: dateViewParam, type } = useParams<{ dateView?: string; type?: string }>();
   const theme = useTheme();
-  const activities = useAppSelector(state => state.activity.activities);
+  const dispatch = useAppDispatch();
   const amountVisibility = useAppSelector(state => state.app.amountVisibility);
   const navigate = useNavigate();
 
   const expense = type === 'expense';
   const dateView = useMemo(() => new Date(dateViewParam || new Date().toISOString()), [dateViewParam]);
+  const monthKey = `${dateView.getFullYear()}-${String(dateView.getMonth() + 1).padStart(2, '0')}`;
+  const monthActivities = useAppSelector(state => state.activity.monthlyActivities[monthKey] ?? []);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchMonthActivitiesThunk({ month: dateView.getMonth() + 1, year: dateView.getFullYear() }));
+  }, [monthKey]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -35,17 +42,10 @@ export default function AllocationPage() {
   }, []);
 
   const { data, total } = useMemo(() => {
-    const filtered = activities.filter(activity => {
-      const d = new Date(activity.date);
-      return (
-        d.getMonth() === dateView.getMonth() &&
-        d.getFullYear() === dateView.getFullYear() &&
-        activity.expense === expense
-      );
-    });
     const allocation: { amount: number; category: Categories; count: number }[] = [];
     let total = 0;
-    for (const activity of filtered) {
+    for (const activity of monthActivities) {
+      if (activity.expense !== expense) continue;
       const idx = allocation.findIndex(obj => obj.category === activity.category);
       if (idx > -1) {
         allocation[idx] = {
@@ -58,10 +58,9 @@ export default function AllocationPage() {
       }
       total += Number(activity.amount);
     }
-    // Sort by amount descending
     allocation.sort((a, b) => b.amount - a.amount);
     return { data: allocation, total };
-  }, [activities, dateView, expense]);
+  }, [monthActivities, expense]);
 
   return (
     <ScreenLayout
