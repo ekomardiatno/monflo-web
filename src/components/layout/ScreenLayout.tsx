@@ -21,7 +21,7 @@ export default function ScreenLayout({
   const theme = useTheme();
 
   return (
-    <div className="flex flex-col flex-1 min-h-full" style={{ backgroundColor: theme.backgroundBasicColor1 }}>
+    <div className="flex flex-col flex-1" style={{ backgroundColor: theme.backgroundBasicColor1 }}>
       {title && (
         <div
           className="sticky top-0 z-30 overflow-hidden"

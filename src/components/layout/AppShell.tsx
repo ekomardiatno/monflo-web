@@ -18,12 +18,12 @@ export default function AppShell({ children }: { children?: ReactNode }) {
 
   return (
     <div
-      className="min-h-full flex"
+      className="h-screen flex"
       style={{ backgroundColor: theme.backgroundBasicColor3 }}
     >
       <SidebarNav />
       <div
-        className="w-full lg:w-auto lg:flex-1 min-h-full relative shadow-2xl lg:shadow-none flex flex-col overflow-x-hidden"
+        className="w-full lg:w-auto lg:flex-1 relative shadow-2xl lg:shadow-none flex flex-col overflow-y-auto overflow-x-hidden"
         style={{ backgroundColor: theme.backgroundBasicColor1 }}
       >
         {children ?? <Outlet />}
