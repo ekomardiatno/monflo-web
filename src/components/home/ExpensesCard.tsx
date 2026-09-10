@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import numeral from 'numeral';
 import dayjs from 'dayjs';
@@ -61,6 +61,21 @@ export default function ExpensesCard({ currentDate = new Date() }: { currentDate
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0, dragged: false });
+  const [fadeRight, setFadeRight] = useState(true);
+  const [fadeLeft, setFadeLeft] = useState(false);
+
+  const updateFade = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+    const atStart = el.scrollLeft <= 2;
+    setFadeRight(!atEnd);
+    setFadeLeft(!atStart);
+  }, []);
+
+  useEffect(() => {
+    updateFade();
+  }, [categoriesAmount, updateFade]);
 
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     const el = scrollRef.current;
@@ -96,19 +111,29 @@ export default function ExpensesCard({ currentDate = new Date() }: { currentDate
 
   return (
     <div>
-      <p className="text-[13px] font-semibold px-5 mb-2.5" style={{ color: theme.textHintColor }}>
+      <p className="text-[13px] font-semibold px-5 mb-2.5 lg:px-0" style={{ color: theme.textHintColor }}>
         {capitalizeFirstText(monthDifferenceTitle(startDateCurrentMonth))} expenses
       </p>
       <div
         ref={scrollRef}
         className="overflow-x-auto scrollbar-hide select-none"
-        style={{ cursor: 'grab' }}
+        style={{
+          cursor: 'grab',
+          maskImage: fadeLeft && fadeRight
+            ? 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)'
+            : fadeRight
+              ? 'linear-gradient(to right, black calc(100% - 40px), transparent)'
+              : fadeLeft
+                ? 'linear-gradient(to right, transparent, black 40px)'
+                : undefined,
+        }}
+        onScroll={updateFade}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUpOrLeave}
         onMouseLeave={onMouseUpOrLeave}
       >
-        <div className="flex gap-2.5 px-5 pb-1">
+        <div className="flex gap-2.5 px-5 pb-1 lg:px-0">
           {categoriesAmount.map(row => {
             const diff = row.amount - row.previousAmount;
             const catInfo = iconInfo(row.category);
@@ -116,11 +141,10 @@ export default function ExpensesCard({ currentDate = new Date() }: { currentDate
             return (
               <button
                 key={row.category}
-                className="shrink-0 rounded-2xl overflow-hidden text-left transition-opacity active:opacity-80"
+                className="shrink-0 rounded-2xl overflow-hidden text-left transition-opacity active:opacity-80 min-w-[42%] lg:min-w-[200px]"
                 style={{
                   backgroundColor: theme.backgroundBasicColor0,
                   boxShadow: cardShadow,
-                  minWidth: '42%',
                   padding: '16px',
                 }}
                 onClick={() => {

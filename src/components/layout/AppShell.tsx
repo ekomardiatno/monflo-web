@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTheme } from '@/hooks/useTheme';
 import { useEffect } from 'react';
+import SidebarNav from './SidebarNav';
 
 export default function AppShell({ children }: { children?: ReactNode }) {
   const theme = useTheme();
@@ -17,11 +18,12 @@ export default function AppShell({ children }: { children?: ReactNode }) {
 
   return (
     <div
-      className="min-h-full flex justify-center"
+      className="min-h-full flex"
       style={{ backgroundColor: theme.backgroundBasicColor3 }}
     >
+      <SidebarNav />
       <div
-        className="w-full max-w-[430px] min-h-full relative shadow-2xl flex flex-col"
+        className="w-full lg:w-auto lg:flex-1 min-h-full relative shadow-2xl lg:shadow-none flex flex-col overflow-x-hidden"
         style={{ backgroundColor: theme.backgroundBasicColor1 }}
       >
         {children ?? <Outlet />}

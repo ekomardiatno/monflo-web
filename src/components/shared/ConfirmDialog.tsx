@@ -108,7 +108,7 @@ export default function ConfirmDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center"
+      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center"
       style={{
         backgroundColor: theme.backgroundModalBackdropColor,
         opacity: backdropOpacity,
@@ -117,7 +117,7 @@ export default function ConfirmDialog({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-[430px] rounded-t-3xl pt-3 pb-6 px-5"
+        className="w-full max-w-[430px] rounded-t-3xl lg:rounded-3xl pt-3 pb-6 px-5"
         style={{
           backgroundColor: theme.backgroundBasicColor0,
           transform: open

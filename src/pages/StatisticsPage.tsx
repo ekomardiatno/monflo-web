@@ -17,15 +17,21 @@ export default function StatisticsPage() {
       <MonthPicker value={dateView} onChange={setDateView} />
 
       <div className="space-y-6 pb-8">
-        <Balance dateView={dateView} />
-        <Overview dateView={dateView} />
-        <Allocation dateView={dateView} />
-        <Allocation dateView={dateView} expense />
-        <div className="px-5">
-          <TrendChart dateView={dateView} />
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:px-5 space-y-6 lg:space-y-0">
+          <Balance dateView={dateView} />
+          <Overview dateView={dateView} />
         </div>
-        <div className="px-5">
-          <TrendChart dateView={dateView} expense />
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:px-5 space-y-6 lg:space-y-0">
+          <Allocation dateView={dateView} />
+          <Allocation dateView={dateView} expense />
+        </div>
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:px-5 space-y-6 lg:space-y-0">
+          <div className="px-5 lg:px-0">
+            <TrendChart dateView={dateView} />
+          </div>
+          <div className="px-5 lg:px-0">
+            <TrendChart dateView={dateView} expense />
+          </div>
         </div>
       </div>
     </ScreenLayout>

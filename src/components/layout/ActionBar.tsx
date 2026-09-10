@@ -42,9 +42,8 @@ export default function ActionBar() {
 
   return (
     <div
-      className="fixed bottom-5 left-0 right-0 mx-auto z-20"
+      className="fixed bottom-5 left-0 right-0 mx-auto z-20 lg:hidden max-w-[500px]"
       style={{
-        maxWidth: 'calc(430px - 40px)',
         width: 'calc(100% - 40px)',
       }}
     >

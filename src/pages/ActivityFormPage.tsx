@@ -138,7 +138,7 @@ function CategorySheet({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center"
+      className="fixed inset-0 z-50 flex items-end lg:items-center justify-center"
       style={{
         backgroundColor: theme.backgroundModalBackdropColor,
         opacity: backdropOpacity,
@@ -148,7 +148,7 @@ function CategorySheet({
     >
       <div
         ref={sheetRef}
-        className="w-full max-w-[430px] overflow-hidden"
+        className="w-full max-w-[430px] overflow-hidden lg:rounded-3xl"
         style={{
           borderTopLeftRadius: 24, borderTopRightRadius: 24,
           backgroundColor: theme.backgroundBasicColor2,
@@ -422,7 +422,7 @@ export default function ActivityFormPage() {
           backgroundColor: theme.backgroundBasicColor1,
         }}
       >
-        <div className="px-5 pt-6 pb-8">
+        <div className="px-5 pt-6 pb-8 lg:max-w-[600px] lg:mx-auto lg:w-full">
 
           {/* Date & Time row */}
           <div className="flex gap-3 mb-5">

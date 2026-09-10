@@ -91,7 +91,7 @@ function SettingRow({
       className={`w-full text-left ${onPress && !disabled ? 'hover:opacity-80 active:opacity-60 transition-opacity' : ''}`}
       onClick={onPress && !disabled ? onPress : undefined}
     >
-      <div className="flex items-center px-4">
+      <div className="flex items-center px-4 min-h-[64px]">
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           style={{ backgroundColor: iconBg || theme.backgroundBasicColor3 }}
@@ -252,6 +252,7 @@ export default function SettingsPage() {
 
   return (
     <ScreenLayout title="Settings">
+      <div className="lg:max-w-[600px] lg:mx-auto lg:w-full">
       {/* Appearance */}
       <SectionLabel>Appearance</SectionLabel>
       <div className="mx-5 rounded-2xl overflow-hidden" style={{ backgroundColor: theme.backgroundBasicColor0 }}>
@@ -544,13 +545,10 @@ export default function SettingsPage() {
           iconColor={COLORS.colorBasic000}
           iconBg={COLORS.colorBasic600}
           title="Version"
-          right={
-            <span className="text-[12px] font-mono" style={{ color: theme.textDisabledColor }}>
-              1.0.0
-            </span>
-          }
+          subtitle={__APP_VERSION__}
           last
         />
+      </div>
       </div>
     </ScreenLayout>
   );

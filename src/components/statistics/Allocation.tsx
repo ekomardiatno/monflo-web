@@ -44,7 +44,7 @@ export default function Allocation({
   }, [activities, dateView, expense]);
 
   return (
-    <div style={style} className={customTitle ? '' : 'px-5'}>
+    <div style={style} className={customTitle ? '' : 'px-5 lg:px-0'}>
       <div className={`flex items-center mb-3 ${customTitle ? 'px-4' : ''}`}>
         <div className="flex-1">
           {customTitle || (

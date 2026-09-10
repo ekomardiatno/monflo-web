@@ -35,7 +35,7 @@ export default function Overview({
   ];
 
   return (
-    <div style={style} className="px-5">
+    <div style={style} className="px-5 lg:px-0">
       <div className="flex items-center mb-3">
         <p className="text-[13px] font-semibold flex-1" style={{ color: theme.textHintColor }}>
           Overview

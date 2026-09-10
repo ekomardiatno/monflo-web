@@ -35,7 +35,7 @@ export default function Balance({
     : '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02)';
 
   return (
-    <div style={style} className="px-5">
+    <div style={style} className="px-5 lg:px-0">
       <p className="text-[13px] font-semibold mb-3" style={{ color: theme.textHintColor }}>
         Balance
       </p>
