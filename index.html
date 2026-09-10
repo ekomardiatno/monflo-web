@@ -20,6 +20,33 @@
         body { background-color: #020617; }
       }
     </style>
+    <script>
+      (function () {
+        var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var c = d ? '#020617' : '#f8fafc';
+        var m = {
+          name: 'Monflo',
+          short_name: 'Monflo',
+          description: 'Track your money flow with ease',
+          theme_color: c,
+          background_color: c,
+          display: 'standalone',
+          start_url: './',
+          scope: './',
+          icons: [
+            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+            { src: 'pwa-192x192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+            { src: 'pwa-512x512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+          ]
+        };
+        var b = new Blob([JSON.stringify(m)], { type: 'application/json' });
+        var l = document.createElement('link');
+        l.rel = 'manifest';
+        l.href = URL.createObjectURL(b);
+        document.head.appendChild(l);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
