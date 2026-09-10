@@ -1,8 +1,8 @@
 name: Deploy Monflo Web
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
 
 jobs:
   deploy:
@@ -26,8 +26,6 @@ jobs:
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-          VITE_BASE_PATH: /monflo/
-
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -37,7 +35,7 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo mkdir -p /var/www/html/monflo && sudo chown ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/html/monflo"
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo mkdir -p /var/www/monflo && sudo chown ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/monflo"
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key" \
-            dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/html/monflo/
+            dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/monflo/
