@@ -83,6 +83,13 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #020617;
+  }
 }
 
 .scrollbar-hide::-webkit-scrollbar {

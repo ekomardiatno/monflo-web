@@ -8,10 +8,12 @@ export default function AppShell({ children }: { children?: ReactNode }) {
 
   useEffect(() => {
     document.body.style.backgroundColor = theme.backgroundBasicColor1;
+    const metaTags = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
+    metaTags.forEach(tag => tag.setAttribute('content', theme.backgroundBasicColor1));
     return () => {
       document.body.style.backgroundColor = '';
     };
-  }, [theme.backgroundBasicColor3])
+  }, [theme.backgroundBasicColor1])
 
   return (
     <div
