@@ -6,7 +6,7 @@ import path from 'path'
 
 export default defineConfig({
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.APP_VERSION || 'dev'),
+    __APP_VERSION__: JSON.stringify((process.env.APP_VERSION || 'dev').replace(/^v/, '')),
   },
   base: process.env.VITE_BASE_PATH || '/',
   plugins: [
