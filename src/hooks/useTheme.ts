@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { setAppearanceType } from '@/store/slices/appSlice';
+import { useAppSelector } from '@/store/hooks';
 import { LIGHT_THEME, DARK_THEME } from '@/constants';
 import type { ThemeColors } from '@/types';
 
 export function useTheme(): ThemeColors {
   const appearanceType = useAppSelector(state => state.app.appearanceType);
   const autoSelectAppearance = useAppSelector(state => state.app.autoSelectAppearance);
-  const dispatch = useAppDispatch();
 
   const [systemTheme, setSystemTheme] = useState<'LIGHT' | 'DARK'>(() =>
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT'
@@ -21,13 +19,6 @@ export function useTheme(): ThemeColors {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
-
-  /* When auto-select is on, sync the stored appearanceType to the device theme */
-  useEffect(() => {
-    if (autoSelectAppearance && appearanceType !== systemTheme) {
-      dispatch(setAppearanceType(systemTheme));
-    }
-  }, [autoSelectAppearance, systemTheme, appearanceType, dispatch]);
 
   const resolvedTheme = autoSelectAppearance ? systemTheme : appearanceType;
 
