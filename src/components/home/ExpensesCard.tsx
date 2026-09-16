@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback, useState, useEffect } from "react";
+import { useMemo, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import numeral from "numeral";
 import dayjs from "dayjs";
@@ -118,16 +118,21 @@ export default function ExpensesCard({
     scrollLeft: 0,
     dragged: false,
   });
-  const [fadeRight, setFadeRight] = useState(true);
-  const [fadeLeft, setFadeLeft] = useState(false);
-
   const updateFade = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
     const atStart = el.scrollLeft <= 2;
-    setFadeRight(!atEnd);
-    setFadeLeft(!atStart);
+    const mask =
+      !atStart && !atEnd
+        ? "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)"
+        : !atEnd
+          ? "linear-gradient(to right, black calc(100% - 40px), transparent)"
+          : !atStart
+            ? "linear-gradient(to right, transparent, black 40px)"
+            : "";
+    el.style.maskImage = mask;
+    el.style.webkitMaskImage = mask;
   }, []);
 
   useEffect(() => {
@@ -184,17 +189,7 @@ export default function ExpensesCard({
       <div
         ref={scrollRef}
         className="overflow-x-auto scrollbar-hide select-none"
-        style={{
-          cursor: "grab",
-          maskImage:
-            fadeLeft && fadeRight
-              ? "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)"
-              : fadeRight
-                ? "linear-gradient(to right, black calc(100% - 40px), transparent)"
-                : fadeLeft
-                  ? "linear-gradient(to right, transparent, black 40px)"
-                  : undefined,
-        }}
+        style={{ cursor: "grab" }}
         onScroll={updateFade}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
